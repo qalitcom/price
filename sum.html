@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ticket Pricing Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h2 {
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a4a4a;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1976D2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .result {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .result h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .result p {
+            margin: 12px 0;
+            font-size: 16px;
+            color: #4a4a4a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result span {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 16px;
+        }
+
+        .price-per-ticket {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .calculation-steps {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎫 Ticket Pricing Calculator</h2>
+        
+        <div class="input-group">
+            <label>Wholesale Price per Ticket ($)</label>
+            <input type="number" step="0.01" id="wholesale" required>
+            <div class="note">Base price without any additional costs</div>
+        </div>
+
+        <div class="input-group">
+            <label>Quantity</label>
+            <input type="number" id="quantity" value="1" min="1" required>
+        </div>
+
+        <div class="input-group">
+            <label>Tax Percentage (%)</label>
+            <input type="number" step="0.1" id="tax_percent">
+        </div>
+
+        <div class="input-group">
+            <label>Partner Markup Type</label>
+            <select id="markup_type">
+                <option value="fixed">Fixed Amount</option>
+                <option value="percent">Percentage</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Partner Markup Value</label>
+            <input type="number" step="0.01" id="markup_value">
+        </div>
+
+        <button onclick="calculate()">Calculate Total Price</button>
+
+        <div class="result">
+            <div class="calculation-steps">
+                <h3>Calculation Details</h3>
+                <p>Total Wholesale: <span id="total_wholesale">$0</span></p>
+                <p>Retail Price per Ticket: <span id="retail_per_unit">$0</span></p>
+                <p>Tax per Ticket: <span id="tax_per_unit">$0</span></p>
+                <p>Price after Tax: <span id="price_after_tax_unit">$0</span></p>
+                <p>Price after Markup: <span id="price_after_markup_unit">$0</span></p>
+            </div>
+
+            <hr>
+
+            <div class="total-summary">
+                <p>Total Before Fees: <span id="total_before_fee">$0</span></p>
+                <p>Service Fee (4.5%): <span id="service_fee">$0</span></p>
+                <p class="price-per-ticket">Final Total Price: <span id="final_price">$0</span></p>
+                <p>Price per Ticket: <span id="price_per_ticket">$0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function roundUpToWhole(value) {
+            return Math.ceil(value);
+        }
+
+        function calculate() {
+            const wholesale = parseFloat(document.getElementById('wholesale').value);
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
+            const markupType = document.getElementById('markup_type').value;
+            const markupValue = parseFloat(document.getElementById('markup_value').value) || 0;
+
+            // Calculate Total Wholesale
+            const totalWholesale = roundUpToWhole(wholesale * quantity);
+
+            // Tevo Markup per unit
+            let tevoMarkup;
+            if (wholesale < 500) {
+                tevoMarkup = 75;
+            } else if (wholesale < 1000) {
+                tevoMarkup = 125;
+            } else {
+                tevoMarkup = roundUpToWhole(wholesale * 0.12);
+            }
+
+            // Retail Price per unit
+            const retailPerUnit = roundUpToWhole(wholesale + tevoMarkup);
+
+            // Tax per unit
+            const taxPerUnit = roundUpToWhole(wholesale * (taxPercent / 100));
+
+            // Price after Tax per unit
+            const priceAfterTaxPerUnit = roundUpToWhole(retailPerUnit + taxPerUnit);
+
+            // Partner Markup per unit
+            let priceAfterMarkupPerUnit = priceAfterTaxPerUnit;
+            if (markupType === 'fixed') {
+                priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupValue);
+            } else if (markupType === 'percent') {
+                const markupAmount = roundUpToWhole(priceAfterMarkupPerUnit * (markupValue / 100));
+                priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupAmount);
+            }
+
+            // Total calculations
+            const totalBeforeFee = priceAfterMarkupPerUnit * quantity;
+            const serviceFee = roundUpToWhole(totalBeforeFee * 0.045);
+            const finalPrice = roundUpToWhole(totalBeforeFee + serviceFee);
+            const pricePerTicket = roundUpToWhole(finalPrice / quantity);
+
+            // Update results
+            document.getElementById('total_wholesale').textContent = `$${totalWholesale}`;
+            document.getElementById('retail_per_unit').textContent = `$${retailPerUnit}`;
+            document.getElementById('tax_per_unit').textContent = `$${taxPerUnit}`;
+            document.getElementById('price_after_tax_unit').textContent = `$${priceAfterTaxPerUnit}`;
+            document.getElementById('price_after_markup_unit').textContent = `$${priceAfterMarkupPerUnit}`;
+            document.getElementById('total_before_fee').textContent = `$${totalBeforeFee}`;
+            document.getElementById('service_fee').textContent = `$${serviceFee}`;
+            document.getElementById('final_price').textContent = `$${finalPrice}`;
+            document.getElementById('price_per_ticket').textContent = `$${pricePerTicket}`;
+        }
+    </script>
+</body>
+</html>
