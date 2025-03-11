@@ -1,59 +1,161 @@
-<div class="input-group">
-    <label>Service Fee (%)</label>
-    <input type="number" step="0.1" id="service_fee_percent" value="4.5">
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advanced Ticket Pricing Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
 
-<button onclick="calculate()">Calculate Total Price</button>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
 
-<div class="result">
-    <div class="calculation-steps">
-        <h3>Detailed Calculation Breakdown</h3>
-        <div id="detailed_calculation"></div>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h2 {
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a4a4a;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #1976D2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .result {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .result h3 {
+            color: #1a1a1a;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .result p {
+            margin: 12px 0;
+            font-size: 16px;
+            color: #4a4a4a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result span {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎫 Advanced Ticket Pricing Calculator</h2>
+        <div class="input-group">
+            <label>Wholesale Price per Ticket ($)</label>
+            <input type="number" step="0.01" id="wholesale" required>
+        </div>
+        <div class="input-group">
+            <label>Quantity</label>
+            <input type="number" id="quantity" value="1" min="1" required>
+        </div>
+        <div class="input-group">
+            <label>Tax Percentage (%)</label>
+            <input type="number" step="0.1" id="tax_percent" value="0">
+        </div>
+        <button onclick="calculate()">Calculate Total Price</button>
+        <div class="result">
+            <h3>Calculation Result</h3>
+            <p>Total Before Fees: <span id="total_before_fee">$0</span></p>
+            <p>Service Fee (4.5%): <span id="service_fee">$0</span></p>
+            <p>Final Total Price: <span id="final_price">$0</span></p>
+        </div>
     </div>
-
-    <hr>
-
-    <div class="total-summary">
-        <p class="tax-calculation">Tax per Ticket: 
-            <span id="tax_per_unit">$0</span>
-        </p>
-        <p class="profit-margin">Profit Margin after Markup: 
-            <span id="profit_margin">$0</span> 
-            (<span id="profit_margin_percent">0%</span>)
-        </p>
-        <p>Total Before Fees: <span id="total_before_fee">$0</span></p>
-        <p>Service Fee: <span id="service_fee">$0</span></p>
-        <p class="price-per-ticket">Final Total Price: 
-            <span id="final_price">$0</span>
-            <span class="currency-rate" id="final_price_eur">€0</span>
-            <span class="currency-rate" id="final_price_gbp">£0</span>
-        </p>
-        <p>Price per Ticket: <span id="price_per_ticket">$0</span></p>
-    </div>
-</div>
-
-<script>
-function calculate() {
-    const wholesale = parseFloat(document.getElementById('wholesale').value);
-    const quantity = parseInt(document.getElementById('quantity').value) || 1;
-    const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
-    const markupType = document.getElementById('markup_type').value;
-    const markupValue = parseFloat(document.getElementById('markup_value').value) || 0;
-    const serviceFeePercent = parseFloat(document.getElementById('service_fee_percent').value) || 4.5;
-
-    const totalWholesale = wholesale * quantity;
-    const taxAmount = totalWholesale * (taxPercent / 100);
-    let markupAmount = markupType === 'fixed' ? markupValue : totalWholesale * (markupValue / 100);
-    const totalBeforeFee = totalWholesale + taxAmount + markupAmount;
-    const serviceFee = totalBeforeFee * (serviceFeePercent / 100);
-    const finalTotal = totalBeforeFee + serviceFee;
-
-    document.getElementById('tax_per_unit').textContent = `$${taxAmount.toFixed(2)}`;
-    document.getElementById('profit_margin').textContent = `$${markupAmount.toFixed(2)}`;
-    document.getElementById('profit_margin_percent').textContent = `${((markupAmount / totalWholesale) * 100).toFixed(2)}%`;
-    document.getElementById('total_before_fee').textContent = `$${totalBeforeFee.toFixed(2)}`;
-    document.getElementById('service_fee').textContent = `$${serviceFee.toFixed(2)}`;
-    document.getElementById('final_price').textContent = `$${finalTotal.toFixed(2)}`;
-    document.getElementById('price_per_ticket').textContent = `$${(finalTotal / quantity).toFixed(2)}`;
-}
-</script>
+    <script>
+        function calculate() {
+            const wholesale = parseFloat(document.getElementById('wholesale').value);
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
+            
+            if (isNaN(wholesale)) {
+                alert('Please enter a valid wholesale price');
+                return;
+            }
+            
+            const totalWholesale = wholesale * quantity;
+            const taxAmount = totalWholesale * (taxPercent / 100);
+            const totalBeforeFee = totalWholesale + taxAmount;
+            const serviceFee = totalBeforeFee * 0.045;
+            const finalTotal = totalBeforeFee + serviceFee;
+            
+            document.getElementById('total_before_fee').textContent = `$${totalBeforeFee.toFixed(2)}`;
+            document.getElementById('service_fee').textContent = `$${serviceFee.toFixed(2)}`;
+            document.getElementById('final_price').textContent = `$${finalTotal.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
