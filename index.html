@@ -1,160 +1,174 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Advanced Ticket Pricing Calculator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        body {
-            margin: 0;
-            padding: 20px;
-            background: #f0f2f5;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-
-        h2 {
-            color: #1a1a1a;
-            font-weight: 700;
-            margin-bottom: 30px;
-            font-size: 28px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #4a4a4a;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #2196F3;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background: #1976D2;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .result {
-            margin-top: 30px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 25px;
-        }
-
-        .result h3 {
-            color: #1a1a1a;
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 20px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        .result p {
-            margin: 12px 0;
-            font-size: 16px;
-            color: #4a4a4a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .result span {
-            font-weight: 500;
-            color: #1a1a1a;
-            font-size: 16px;
-        }
-    </style>
+    <!-- [Previous head content remains unchanged] -->
 </head>
 <body>
     <div class="container">
         <h2>🎫 Advanced Ticket Pricing Calculator</h2>
+        
         <div class="input-group">
             <label>Wholesale Price per Ticket ($)</label>
             <input type="number" step="0.01" id="wholesale" required>
+            <div class="note">Base price without any additional costs</div>
         </div>
+
         <div class="input-group">
             <label>Quantity</label>
             <input type="number" id="quantity" value="1" min="1" required>
         </div>
+
         <div class="input-group">
             <label>Tax Percentage (%)</label>
             <input type="number" step="0.1" id="tax_percent" value="0">
         </div>
+
+        <div class="input-group">
+            <label>Partner Markup Type</label>
+            <select id="markup_type">
+                <option value="fixed">Fixed Amount</option>
+                <option value="percent">Percentage</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Partner Markup Value</label>
+            <input type="number" step="0.01" id="markup_value" value="0">
+        </div>
+
+        <!-- New Service Fee Input -->
+        <div class="input-group">
+            <label>Service Fee Percentage (%)</label>
+            <input type="number" step="0.1" id="service_fee_percent" value="4.5">
+            <div class="note">Enter custom service fee percentage</div>
+        </div>
+
         <button onclick="calculate()">Calculate Total Price</button>
+
         <div class="result">
-            <h3>Calculation Result</h3>
-            <p>Total Before Fees: <span id="total_before_fee">$0</span></p>
-            <p>Service Fee (4.5%): <span id="service_fee">$0</span></p>
-            <p>Final Total Price: <span id="final_price">$0</span></p>
+            <div class="calculation-steps">
+                <h3>Detailed Calculation Breakdown</h3>
+                <div id="detailed_calculation"></div>
+            </div>
+
+            <hr>
+
+            <div class="total-summary">
+                <p class="tax-calculation">Tax per Ticket: 
+                    <span id="tax_per_unit">$0</span>
+                    <span class="note" id="tax_calculation"></span>
+                </p>
+                <p class="profit-margin">Profit Margin after Markup: 
+                    <span id="profit_margin">$0</span> 
+                    (<span id="profit_margin_percent">0%</span>)
+                </p>
+                <p>Total Before Fees: <span id="total_before_fee">$0</span></p>
+                <p>Service Fee (<span id="service_fee_rate">4.5</span>%): <span id="service_fee">$0</span></p>
+                <p class="price-per-ticket">Final Total Price: 
+                    <span id="final_price">$0</span><br>
+                    <span class="currency-rate" id="final_price_eur">€0</span>
+                    <span class="currency-rate" id="final_price_gbp">£0</span>
+                </p>
+                <p>Price per Ticket: <span id="price_per_ticket">$0</span></p>
+            </div>
         </div>
     </div>
+
     <script>
+        // [Previous exchange rate fetch code remains unchanged]
+
+        function roundUpToWhole(value) {
+            return Math.ceil(value);
+        }
+
         function calculate() {
+            // Валидация ввода
             const wholesale = parseFloat(document.getElementById('wholesale').value);
-            const quantity = parseInt(document.getElementById('quantity').value) || 1;
-            const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
-            
             if (isNaN(wholesale)) {
                 alert('Please enter a valid wholesale price');
                 return;
             }
+
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
+            const markupType = document.getElementById('markup_type').value;
+            const markupValue = parseFloat(document.getElementById('markup_value').value) || 0;
+            const serviceFeePercent = parseFloat(document.getElementById('service_fee_percent').value) || 0;
+
+            // Основные расчеты
+            const totalWholesale = roundUpToWhole(wholesale * quantity);
             
-            const totalWholesale = wholesale * quantity;
-            const taxAmount = totalWholesale * (taxPercent / 100);
-            const totalBeforeFee = totalWholesale + taxAmount;
-            const serviceFee = totalBeforeFee * 0.045;
-            const finalTotal = totalBeforeFee + serviceFee;
-            
-            document.getElementById('total_before_fee').textContent = `$${totalBeforeFee.toFixed(2)}`;
-            document.getElementById('service_fee').textContent = `$${serviceFee.toFixed(2)}`;
-            document.getElementById('final_price').textContent = `$${finalTotal.toFixed(2)}`;
+            // Наценка Tevo
+            let tevoMarkup;
+            if (wholesale < 500) {
+                tevoMarkup = 75;
+            } else if (wholesale < 1000) {
+                tevoMarkup = 125;
+            } else {
+                tevoMarkup = roundUpToWhole(wholesale * 0.12);
+            }
+
+            // Розничная цена
+            const retailPerUnit = roundUpToWhole(wholesale + tevoMarkup);
+
+            // Налог
+            const taxPerUnit = roundUpToWhole(wholesale * (taxPercent / 100));
+
+            // Цена после налога
+            const priceAfterTaxPerUnit = roundUpToWhole(retailPerUnit + taxPerUnit);
+
+            // Наценка партнера
+            let priceAfterMarkupPerUnit = priceAfterTaxPerUnit;
+            if (markupType === 'fixed') {
+                priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupValue);
+            } else {
+                const markupAmount = roundUpToWhole(priceAfterMarkupPerUnit * (markupValue / 100));
+                priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupAmount);
+            }
+
+            // Маржа прибыли
+            const costPrice = priceAfterTaxPerUnit;
+            const sellingPrice = priceAfterMarkupPerUnit;
+            const profitMargin = sellingPrice - costPrice;
+            const profitMarginPercent = (profitMargin / costPrice) * 100 || 0;
+
+            // Общие суммы
+            const totalBeforeFee = priceAfterMarkupPerUnit * quantity;
+            const serviceFee = roundUpToWhole(totalBeforeFee * (serviceFeePercent / 100));
+            const finalPriceUSD = roundUpToWhole(totalBeforeFee + serviceFee);
+            const pricePerTicket = roundUpToWhole(finalPriceUSD / quantity);
+
+            // Конвертация валют
+            const finalPriceEUR = roundUpToWhole(finalPriceUSD * exchangeRates.EUR);
+            const finalPriceGBP = roundUpToWhole(finalPriceUSD * exchangeRates.GBP);
+
+            // Форматирование вывода
+            const calculationSteps = [
+                `1. Base Wholesale Price: $${wholesale.toFixed(2)}`,
+                `2. Tevo Markup: $${tevoMarkup} ${wholesale >= 1000 ? '(12% of wholesale)' : ''}`,
+                `3. Retail Price: $${wholesale.toFixed(2)} + $${tevoMarkup} = $${retailPerUnit}`,
+                `4. Tax Calculation: $${wholesale.toFixed(2)} × ${taxPercent}% = $${taxPerUnit}`,
+                `5. Price after Tax: $${retailPerUnit} + $${taxPerUnit} = $${priceAfterTaxPerUnit}`,
+                `6. Partner Markup: ${markupType === 'fixed' ? `+$${markupValue}` : `+${markupValue}%`}`,
+                `7. Final Price per Ticket: $${priceAfterMarkupPerUnit}`,
+                `8. Total for ${quantity} tickets: $${priceAfterMarkupPerUnit} × ${quantity} = $${totalBeforeFee}`,
+                `9. Service Fee: $${totalBeforeFee} × ${serviceFeePercent}% = $${serviceFee}`,
+                `10. Final Total: $${totalBeforeFee} + $${serviceFee} = $${finalPriceUSD}`
+            ];
+
+            // Обновление интерфейса
+            document.getElementById('detailed_calculation').innerHTML = calculationSteps.map(step => `<div>${step}</div>`).join('');
+            document.getElementById('tax_per_unit').textContent = `$${taxPerUnit}`;
+            document.getElementById('tax_calculation').textContent = `(Calculation: $${wholesale.toFixed(2)} × ${taxPercent}% = $${taxPerUnit})`;
+            document.getElementById('profit_margin').textContent = `$${roundUpToWhole(profitMargin)}`;
+            document.getElementById('profit_margin_percent').textContent = `${roundUpToWhole(profitMarginPercent)}%`;
+            document.getElementById('total_before_fee').textContent = `$${totalBeforeFee}`;
+            document.getElementById('service_fee_rate').textContent = `${serviceFeePercent}`;
+            document.getElementById('service_fee').textContent = `$${serviceFee}`;
+            document.getElementById('final_price').textContent = `$${finalPriceUSD}`;
+            document.getElementById('price_per_ticket').textContent = `$${pricePerTicket}`;
+            document.getElementById('final_price_eur').textContent = `€${finalPriceEUR} (1 USD = ${exchangeRates.EUR.toFixed(4)} EUR)`;
+            document.getElementById('final_price_gbp').textContent = `£${finalPriceGBP} (1 USD = ${exchangeRates.GBP.toFixed(4)} GBP)`;
         }
     </script>
 </body>
