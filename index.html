@@ -1,7 +1,212 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- [Previous head content remains unchanged] -->
+    <title>Advanced Ticket Pricing Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 40px;
+            font-size: 32px;
+            text-align: center;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            width: 60px;
+            height: 4px;
+            background: #3498db;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #fff;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+            transform: translateY(-1px);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #2980b9, #2471a3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .result {
+            margin-top: 40px;
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result h3 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 22px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .result p {
+            margin: 15px 0;
+            font-size: 16px;
+            color: #34495e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .result p:hover {
+            background: #f8f9fa;
+        }
+
+        .result span {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .price-per-ticket {
+            background: linear-gradient(45deg, #e8f4f8, #d6eaf8);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.1);
+        }
+
+        .calculation-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .currency-rate {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .profit-margin {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+
+        .tax-calculation {
+            background: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px dashed #ecf0f1;
+            margin: 25px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+                margin: 20px;
+            }
+            
+            h2 {
+                font-size: 26px;
+            }
+            
+            button {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -36,7 +241,6 @@
             <input type="number" step="0.01" id="markup_value" value="0">
         </div>
 
-        <!-- New Service Fee Input -->
         <div class="input-group">
             <label>Service Fee Percentage (%)</label>
             <input type="number" step="0.1" id="service_fee_percent" value="4.5">
@@ -75,14 +279,51 @@
     </div>
 
     <script>
-        // [Previous exchange rate fetch code remains unchanged]
+        const API_KEY = 'fca_live_3chCj0lPWsU0i3SUevUwOi4Epgl8LWKDR4F1lpu9';
+        let exchangeRates = {
+            EUR: 0.92,
+            GBP: 0.79
+        };
+
+        async function fetchExchangeRates() {
+            try {
+                const response = await fetch(
+                    `https://api.freecurrencyapi.com/v1/latest?apikey=${API_KEY}&base_currency=USD`
+                );
+                const data = await response.json();
+                if(data.data) {
+                    exchangeRates = data.data;
+                    localStorage.setItem('exchangeRates', JSON.stringify({
+                        rates: exchangeRates,
+                        timestamp: Date.now()
+                    }));
+                }
+            } catch (error) {
+                console.error('Error fetching exchange rates:', error);
+                const cachedData = localStorage.getItem('exchangeRates');
+                if (cachedData) {
+                    exchangeRates = JSON.parse(cachedData).rates;
+                }
+            }
+        }
+
+        window.addEventListener('load', async () => {
+            const cachedData = localStorage.getItem('exchangeRates');
+            if (cachedData) {
+                const {rates, timestamp} = JSON.parse(cachedData);
+                if (Date.now() - timestamp < 3600000) {
+                    exchangeRates = rates;
+                    return;
+                }
+            }
+            await fetchExchangeRates();
+        });
 
         function roundUpToWhole(value) {
             return Math.ceil(value);
         }
 
         function calculate() {
-            // Валидация ввода
             const wholesale = parseFloat(document.getElementById('wholesale').value);
             if (isNaN(wholesale)) {
                 alert('Please enter a valid wholesale price');
@@ -95,10 +336,8 @@
             const markupValue = parseFloat(document.getElementById('markup_value').value) || 0;
             const serviceFeePercent = parseFloat(document.getElementById('service_fee_percent').value) || 0;
 
-            // Основные расчеты
             const totalWholesale = roundUpToWhole(wholesale * quantity);
             
-            // Наценка Tevo
             let tevoMarkup;
             if (wholesale < 500) {
                 tevoMarkup = 75;
@@ -108,16 +347,10 @@
                 tevoMarkup = roundUpToWhole(wholesale * 0.12);
             }
 
-            // Розничная цена
             const retailPerUnit = roundUpToWhole(wholesale + tevoMarkup);
-
-            // Налог
             const taxPerUnit = roundUpToWhole(wholesale * (taxPercent / 100));
-
-            // Цена после налога
             const priceAfterTaxPerUnit = roundUpToWhole(retailPerUnit + taxPerUnit);
 
-            // Наценка партнера
             let priceAfterMarkupPerUnit = priceAfterTaxPerUnit;
             if (markupType === 'fixed') {
                 priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupValue);
@@ -126,23 +359,19 @@
                 priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupAmount);
             }
 
-            // Маржа прибыли
             const costPrice = priceAfterTaxPerUnit;
             const sellingPrice = priceAfterMarkupPerUnit;
             const profitMargin = sellingPrice - costPrice;
             const profitMarginPercent = (profitMargin / costPrice) * 100 || 0;
 
-            // Общие суммы
             const totalBeforeFee = priceAfterMarkupPerUnit * quantity;
             const serviceFee = roundUpToWhole(totalBeforeFee * (serviceFeePercent / 100));
             const finalPriceUSD = roundUpToWhole(totalBeforeFee + serviceFee);
             const pricePerTicket = roundUpToWhole(finalPriceUSD / quantity);
 
-            // Конвертация валют
             const finalPriceEUR = roundUpToWhole(finalPriceUSD * exchangeRates.EUR);
             const finalPriceGBP = roundUpToWhole(finalPriceUSD * exchangeRates.GBP);
 
-            // Форматирование вывода
             const calculationSteps = [
                 `1. Base Wholesale Price: $${wholesale.toFixed(2)}`,
                 `2. Tevo Markup: $${tevoMarkup} ${wholesale >= 1000 ? '(12% of wholesale)' : ''}`,
@@ -156,7 +385,6 @@
                 `10. Final Total: $${totalBeforeFee} + $${serviceFee} = $${finalPriceUSD}`
             ];
 
-            // Обновление интерфейса
             document.getElementById('detailed_calculation').innerHTML = calculationSteps.map(step => `<div>${step}</div>`).join('');
             document.getElementById('tax_per_unit').textContent = `$${taxPerUnit}`;
             document.getElementById('tax_calculation').textContent = `(Calculation: $${wholesale.toFixed(2)} × ${taxPercent}% = $${taxPerUnit})`;
