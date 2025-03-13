@@ -355,8 +355,8 @@
             if (markupType === 'fixed') {
                 priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupValue);
             } else {
-                const markupAmount = roundUpToWhole(priceAfterMarkupPerUnit * (markupValue / 100));
-                priceAfterMarkupPerUnit = roundUpToWhole(priceAfterMarkupPerUnit + markupAmount);
+                const markupAmount = roundUpToWhole(priceAfterTaxPerUnit * (markupValue / 100));
+                priceAfterMarkupPerUnit = roundUpToWhole(priceAfterTaxPerUnit + markupAmount);
             }
 
             const costPrice = priceAfterTaxPerUnit;
@@ -365,7 +365,7 @@
             const profitMarginPercent = (profitMargin / costPrice) * 100 || 0;
 
             const totalBeforeFee = priceAfterMarkupPerUnit * quantity;
-            const serviceFee = roundUpToWhole(totalBeforeFee * (serviceFeePercent / 100));
+            const serviceFee = roundUpToWhole(totalBeforeFee / (1 - serviceFeePercent / 100) - totalBeforeFee);
             const finalPriceUSD = roundUpToWhole(totalBeforeFee + serviceFee);
             const pricePerTicket = roundUpToWhole(finalPriceUSD / quantity);
 
@@ -381,7 +381,7 @@
                 `6. Partner Markup: ${markupType === 'fixed' ? `+$${markupValue}` : `+${markupValue}%`}`,
                 `7. Final Price per Ticket: $${priceAfterMarkupPerUnit}`,
                 `8. Total for ${quantity} tickets: $${priceAfterMarkupPerUnit} × ${quantity} = $${totalBeforeFee}`,
-                `9. Service Fee: $${totalBeforeFee} × ${serviceFeePercent}% = $${serviceFee}`,
+                `9. Service Fee: $${totalBeforeFee} / (1 - ${serviceFeePercent}/100) - $${totalBeforeFee} = $${serviceFee}`,
                 `10. Final Total: $${totalBeforeFee} + $${serviceFee} = $${finalPriceUSD}`
             ];
 
